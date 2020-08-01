@@ -102,12 +102,22 @@ function populateUI() {
     element.innerHTML = `<td>${item[0]}</td><td>${item[1]}</td>`;
     resultsTable.appendChild(element);
   });
+
+  const rankIndex = localStorage.getItem("RankIndex");
+  if (rankIndex !== null) {
+    rankSelect.selectedIndex = rankIndex;
+  }
 }
 
 // Reset the results table
 function resetResultsTable() {
   resultsTable.innerHTML = "<tr><th>Rank</th><th>Win/Loss?</th></tr>";
   localStorage.removeItem("Games");
+}
+
+// Update rank so that the selection box remembers the user's rank
+function updateRank(rankIndex) {
+  localStorage.setItem("RankIndex", rankIndex);
 }
 
 // Event listeners
@@ -124,4 +134,8 @@ resetForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   resetResultsTable();
+});
+
+rankSelect.addEventListener("change", (e) => {
+  updateRank(e.target.selectedIndex);
 });
