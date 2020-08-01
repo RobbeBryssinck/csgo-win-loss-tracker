@@ -1,6 +1,7 @@
 const form = document.getElementById("form");
 const rankEl = document.getElementById("rank");
 const winEl = document.getElementById("win");
+const tieEL = document.getElementById("tie");
 const lossEl = document.getElementById("loss");
 const results = document.getElementById("results");
 
@@ -32,7 +33,15 @@ function submitWinLoss() {
   }
 
   const rank = rankEl.value;
-  const winloss = winEl.checked ? winEl.value : lossEl.value;
+
+  let winloss;
+  if (winEl.checked) {
+    winloss = winEl.value;
+  } else if (lossEl.checked) {
+    winloss = lossEl.value;
+  } else if (tieEL.checked) {
+    winloss = tieEL.value;
+  }
   const game = [rank, winloss];
   games.push(game);
 
@@ -41,7 +50,7 @@ function submitWinLoss() {
 
 // Check whether either the win or the loss radio button is selected
 function isWinLossSelected() {
-  return winEl.checked || lossEl.checked;
+  return winEl.checked || lossEl.checked || tieEL.checked;
 }
 
 // TODO: Throw this function away
