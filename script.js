@@ -2,6 +2,7 @@ const form = document.getElementById("form");
 const rankEl = document.getElementById("rank");
 const winEl = document.getElementById("win");
 const lossEl = document.getElementById("loss");
+const results = document.getElementById("results");
 
 // Show input error message
 function showError(input, message) {
@@ -23,8 +24,6 @@ function submitWinLoss() {
     showError(winEl, "You need to select either win or loss.");
     return;
   }
-
-  resetError(winEl);
 
   let games = JSON.parse(localStorage.getItem("Games"));
 
@@ -53,11 +52,14 @@ function checkLocalStorage() {
 }
 
 // Get data and populate UI
-function populateUI() {}
+function populateUI() {
+  results.innerHTML = "";
+}
 
 // Event listeners
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  resetError(winEl);
 
   submitWinLoss();
 });

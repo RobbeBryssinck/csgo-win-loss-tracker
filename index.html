@@ -8,7 +8,7 @@
   </head>
   <body>
     <h1>CS:GO win/loss tracker</h1>
-    <p>Select your rank and wether you won or lost, and then submit.</p>
+    <p>Select your rank and whether you won or lost, and then submit.</p>
 
     <div class="submit-container">
       <h3>Latest match</h3>
@@ -37,7 +37,7 @@
             <option value="suprememasterfirstclass"
               >Supreme Master First Class</option
             >
-            <option value="theglobalelite">The Global Elite</option>
+            <option value="globalelite">Global Elite</option>
           </select>
         </div>
         <div class="form-control form-winloss">
@@ -54,7 +54,26 @@
 
     <div class="results-container">
       <h3>Results</h3>
-      <div class="results" id="results"></div>
+      <div class="results" id="results">
+        <table>
+          <tr>
+            <th>Rank</th>
+            <th>Win/Loss?</th>
+          </tr>
+          <tr>
+            <td>silver3</td>
+            <td>win</td>
+          </tr>
+          <tr>
+            <td>goldnova1</td>
+            <td>win</td>
+          </tr>
+          <tr>
+            <td>goldnovamaster</td>
+            <td>loss</td>
+          </tr>
+        </table>
+      </div>
     </div>
 
     <script src="script.js"></script>
