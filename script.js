@@ -73,18 +73,15 @@ function submitWinLoss() {
   games.push(game);
 
   localStorage.setItem("Games", JSON.stringify(games));
+
+  winEl.checked = false;
+  lossEl.checked = false;
+  tieEL.checked = false;
 }
 
 // Check whether either the win or the loss radio button is selected
 function isWinLossSelected() {
   return winEl.checked || lossEl.checked || tieEL.checked;
-}
-
-// TODO: Throw this function away
-function checkLocalStorage() {
-  const games = JSON.parse(localStorage.getItem("Games"));
-
-  games.forEach((element) => element.forEach((el) => console.log(el)));
 }
 
 // Get data and populate UI
