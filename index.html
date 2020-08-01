@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>CS:GO win/loss tracker</title>
+  </head>
+  <body>
+    <h1>CS:GO win/loss tracker</h1>
+    <p>Select your rank and wether you won or lost, and then submit.</p>
+
+    <div class="submit-container">
+      <h3>Latest match</h3>
+      <form class="form" id="form">
+        <div class="form-control form-rank">
+          <label for="rank" class="formlabel">Rank</label>
+          <select id="rank">
+            <option value="silver1">Silver 1</option>
+            <option value="silver2">Silver 2</option>
+            <option value="silver3">Silver 3</option>
+            <option value="silver4">Silver 4</option>
+            <option value="silverelite">Silver Elite</option>
+            <option value="silverelitemaster">Silver Elite Master</option>
+            <option value="goldnova1">Gold Nova 1</option>
+            <option value="goldnova2">Gold Nova 2</option>
+            <option value="goldnova3">Gold Nova 3</option>
+            <option value="goldnovamaster">Gold Nova Master</option>
+            <option value="masterguardian1">Master Guardian 1</option>
+            <option value="masterguardian2">Master Guardian 2</option>
+            <option value="masterguardianelite">Master Guardian Elite</option>
+            <option value="distinguishedmasterguardian"
+              >Distinguished Master Guardian</option
+            >
+            <option value="legendaryeagle">Legendary Eagle</option>
+            <option value="legendaryeaglemaster">Legendary Eagle Master</option>
+            <option value="suprememasterfirstclass"
+              >Supreme Master First Class</option
+            >
+            <option value="theglobalelite">The Global Elite</option>
+          </select>
+        </div>
+        <div class="form-control form-winloss">
+          <div class="formlabel">Win/lose?</div>
+          <input type="radio" id="win" name="winloss" value="win" />
+          <label for="win">Win</label>
+          <input type="radio" id="loss" name="winloss" value="loss" />
+          <label for="loss">Loss</label>
+          <small>Error message</small>
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div class="results-container">
+      <h3>Results</h3>
+      <div class="results" id="results"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
