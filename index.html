@@ -50,14 +50,14 @@
           <label for="tie">Tie</label>
           <small>Error message</small>
         </div>
-        <button type="submit">Submit</button>
+        <button class="bluebutton" type="submit">Submit</button>
       </form>
     </div>
 
-    <div class="results-container">
+    <div class="results-container" id="results-container">
       <h3>Results</h3>
       <div class="results" id="results">
-        <table>
+        <table id="results-table">
           <tr>
             <th>Rank</th>
             <th>Win/Loss?</th>
@@ -68,7 +68,7 @@
           </tr>
           <tr>
             <td>goldnova1</td>
-            <td>win</td>
+            <td>tie</td>
           </tr>
           <tr>
             <td>goldnovamaster</td>
@@ -76,6 +76,9 @@
           </tr>
         </table>
       </div>
+      <form id="reset-form">
+        <button class="bluebutton" type="submit">Reset</button>
+      </form>
     </div>
 
     <script src="script.js"></script>
