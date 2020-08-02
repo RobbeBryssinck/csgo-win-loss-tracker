@@ -8,6 +8,7 @@ const resultsContainer = document.getElementById("results-container");
 const resetForm = document.getElementById("reset-form");
 const resultsTable = document.getElementById("results-table");
 const rankSelect = document.getElementById("rank");
+let deleteButtons = document.querySelectorAll("#delete-game");
 
 var rankList = {
   silver1: "Silver 1",
@@ -77,6 +78,8 @@ function submitWinLoss() {
   winEl.checked = false;
   lossEl.checked = false;
   tieEL.checked = false;
+
+  deleteButtons = document.querySelectorAll("#delete-game");
 }
 
 // Check whether either the win or the loss radio button is selected
@@ -86,7 +89,8 @@ function isWinLossSelected() {
 
 // Get data and populate UI
 function populateUI() {
-  resultsTable.innerHTML = "<tr><th>Rank</th><th>Win/Loss?</th></tr>";
+  resultsTable.innerHTML =
+    "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
   const data = JSON.parse(localStorage.getItem("Games"));
 
@@ -96,7 +100,7 @@ function populateUI() {
 
   data.forEach((item) => {
     const element = document.createElement("tr");
-    element.innerHTML = `<td>${item[0]}</td><td>${item[1]}</td>`;
+    element.innerHTML = `<td>${item[0]}</td><td>${item[1]}</td><td><button class="delete-btn" id="delete-game">X</button></td>`;
     resultsTable.appendChild(element);
   });
 
@@ -104,11 +108,14 @@ function populateUI() {
   if (rankIndex !== null) {
     rankSelect.selectedIndex = rankIndex;
   }
+
+  deleteButtons = document.querySelectorAll("#delete-game");
 }
 
 // Reset the results table
 function resetResultsTable() {
-  resultsTable.innerHTML = "<tr><th>Rank</th><th>Win/Loss?</th></tr>";
+  resultsTable.innerHTML =
+    "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
   localStorage.removeItem("Games");
 }
 
@@ -116,6 +123,9 @@ function resetResultsTable() {
 function updateRank(rankIndex) {
   localStorage.setItem("RankIndex", rankIndex);
 }
+
+// Deletes a game from storage
+function deleteGame(gameId) {}
 
 // Event listeners
 form.addEventListener("submit", (e) => {
@@ -135,4 +145,10 @@ resetForm.addEventListener("submit", (e) => {
 
 rankSelect.addEventListener("change", (e) => {
   updateRank(e.target.selectedIndex);
+});
+
+resultsContainer.addEventListener("click", (e) => {
+  if (e.target.id === "delete-game") {
+    deleteGame();
+  }
 });
