@@ -8,6 +8,13 @@ namespace CSGOTrackerAPI.Models
         {
         }
 
-        public DbSet<GameDTO> Games { get; set; }
+        public DbSet<Game> Games { get; set; }
+
+        /*
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GameDTO>().ToTable("")
+        }
+        */
     }
 }

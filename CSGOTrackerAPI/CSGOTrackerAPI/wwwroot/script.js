@@ -8,6 +8,7 @@ const resultsContainer = document.getElementById("results-container");
 const resetForm = document.getElementById("reset-form");
 const resultsTable = document.getElementById("results-table");
 const rankSelect = document.getElementById("rank");
+const uri = "api/Games";
 
 var rankList = {
   silver1: "Silver 1",
