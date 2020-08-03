@@ -28,7 +28,7 @@ namespace CSGOTrackerAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<GameContext>(opt =>
-                opt.UseInMemoryDatabase("Games"));
+                opt.UseSqlServer(Configuration.GetConnectionString("GameContext")));
             services.AddControllers();
         }
 
