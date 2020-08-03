@@ -91,11 +91,13 @@ function generateID() {
 }
 
 // Get data and populate UI
-function populateUI() {
+async function populateUI() {
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
-  const data = JSON.parse(localStorage.getItem("Games"));
+  var data = await fetch(uri)
+    .then((res) => res.json())
+    .catch((error) => console.error("Unable to get items.", error));
 
   if (data === null || data.length === 0) {
     localStorage.removeItem("RankIndex");
@@ -104,7 +106,7 @@ function populateUI() {
 
   data.forEach((item) => {
     const element = document.createElement("tr");
-    element.innerHTML = `<td>${item.rank}</td><td>${item.winloss}</td><td><button class="delete-btn" onClick="deleteGame(${item.id})">X</button></td>`;
+    element.innerHTML = `<td>${item.rank}</td><td>${item.winLoss}</td><td><button class="delete-btn" onClick="deleteGame(${item.id})">X</button></td>`;
     resultsTable.appendChild(element);
   });
 
