@@ -48,13 +48,15 @@ function resetError(input) {
 }
 
 // Submit the win or the loss
-function submitWinLoss() {
+async function submitWinLoss() {
   if (!isWinLossSelected()) {
     showError(winEl, "You need to select either win or loss.");
     return;
   }
 
-  let games = JSON.parse(localStorage.getItem("Games"));
+  var games = await fetch(uri)
+    .then((res) => res.json())
+    .catch((error) => console.error("Unable to get items.", error));
 
   if (games === null) {
     games = [];
@@ -71,9 +73,20 @@ function submitWinLoss() {
     winloss = tieEL.value;
   }
   const game = { id: generateID(), rank: rankList[rank], winloss: winloss };
-  games.push(game);
 
-  localStorage.setItem("Games", JSON.stringify(games));
+  var response = await fetch(uri, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(game),
+  })
+    .then((res) => res.json())
+    .then(() => populateUI())
+    .catch((error) => console.error("Unable to add item.", error));
+
+  console.log(response);
 
   winEl.checked = false;
   lossEl.checked = false;
@@ -95,16 +108,16 @@ async function populateUI() {
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
-  var data = await fetch(uri)
+  var games = await fetch(uri)
     .then((res) => res.json())
     .catch((error) => console.error("Unable to get items.", error));
 
-  if (data === null || data.length === 0) {
+  if (games === null || games.length === 0) {
     localStorage.removeItem("RankIndex");
     return;
   }
 
-  data.forEach((item) => {
+  games.forEach((item) => {
     const element = document.createElement("tr");
     element.innerHTML = `<td>${item.rank}</td><td>${item.winLoss}</td><td><button class="delete-btn" onClick="deleteGame(${item.id})">X</button></td>`;
     resultsTable.appendChild(element);
@@ -143,8 +156,6 @@ form.addEventListener("submit", (e) => {
   resetError(winEl);
 
   submitWinLoss();
-
-  populateUI();
 });
 
 resetForm.addEventListener("submit", (e) => {
