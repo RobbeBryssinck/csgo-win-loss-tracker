@@ -143,18 +143,19 @@ function updateRank(rankIndex) {
 }
 
 // Deletes a game from storage
-function deleteGame(id) {
-  let games = JSON.parse(localStorage.getItem("Games"));
-  games = games.filter((game) => game.id !== id);
-  localStorage.setItem("Games", JSON.stringify(games));
-  populateUI();
+async function deleteGame(id) {
+  await fetch(`${uri}/${id}`, {
+    method: "DELETE",
+  })
+    .then(() => populateUI())
+    .catch((error) => console.error("Unable to delete item.", error));
 }
 
 // Event listeners
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  resetError(winEl);
 
+  resetError(winEl);
   submitWinLoss();
 });
 
