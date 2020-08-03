@@ -72,7 +72,7 @@ async function submitWinLoss() {
   } else if (tieEL.checked) {
     winloss = tieEL.value;
   }
-  const game = { id: generateID(), rank: rankList[rank], winloss: winloss };
+  const game = { rank: rankList[rank], winloss: winloss };
 
   var response = await fetch(uri, {
     method: "POST",
@@ -96,11 +96,6 @@ async function submitWinLoss() {
 // Check whether either the win or the loss radio button is selected
 function isWinLossSelected() {
   return winEl.checked || lossEl.checked || tieEL.checked;
-}
-
-// Generate a unique ID for the match
-function generateID() {
-  return Math.floor(Math.random() * 1000000);
 }
 
 // Get data and populate UI
@@ -139,6 +134,7 @@ async function resetResultsTable() {
     deleteGame(game.id);
   });
 
+  // TODO: could be unnecessary since you called populateUI() already
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
