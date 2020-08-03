@@ -130,10 +130,18 @@ async function populateUI() {
 }
 
 // Reset the results table
-function resetResultsTable() {
+async function resetResultsTable() {
+  var games = await fetch(uri)
+    .then((res) => res.json())
+    .catch((error) => console.error("Unable to get items.", error));
+
+  games.forEach((game) => {
+    deleteGame(game.id);
+  });
+
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
-  localStorage.removeItem("Games");
+
   localStorage.removeItem("RankIndex");
 }
 
