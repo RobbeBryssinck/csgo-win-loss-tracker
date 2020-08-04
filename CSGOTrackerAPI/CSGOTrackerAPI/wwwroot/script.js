@@ -8,6 +8,7 @@ const resultsContainer = document.getElementById("results-container");
 const resetForm = document.getElementById("reset-form");
 const resultsTable = document.getElementById("results-table");
 const rankSelect = document.getElementById("rank");
+const logoutBtn = document.getElementById("logout-btn");
 const uriGames = "api/Games";
 const uriRanks = "api/Ranks";
 
@@ -34,7 +35,19 @@ var rankList = {
 
 var loginToken = "Bearer " + localStorage.getItem("token");
 
-populateUI();
+startup();
+
+function startup() {
+  // TODO: make this an actual authorization check
+  const token = localStorage.getItem("token");
+
+  populateUI();
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  redirectToLogin();
+}
 
 // Show input error message
 function showError(input, message) {
@@ -79,7 +92,10 @@ async function submitWinLoss() {
     body: JSON.stringify(game),
   })
     .then(() => populateUI())
-    .catch((error) => console.error("Unable to add item.", error));
+    .catch((error) => {
+      console.error("Unable to add item.", error);
+      redirectToLogin();
+    });
 
   winEl.checked = false;
   lossEl.checked = false;
@@ -102,7 +118,10 @@ async function populateUI() {
     },
   })
     .then((res) => res.json())
-    .catch((error) => console.error("Unable to get items.", error));
+    .catch((error) => {
+      console.error("Unable to get items.", error);
+      redirectToLogin();
+    });
 
   if (games === null || games.length === 0) {
     updateRank(0);
@@ -121,7 +140,10 @@ async function populateUI() {
     },
   })
     .then((res) => res.json())
-    .catch((error) => console.error("Unable to get rank.", error));
+    .catch((error) => {
+      console.error("Unable to get rank.", error);
+      redirectToLogin();
+    });
 
   if (rankIndex !== null) {
     rankSelect.selectedIndex = rankIndex.rankIndex;
@@ -136,7 +158,10 @@ async function resetResultsTable() {
     },
   })
     .then((res) => res.json())
-    .catch((error) => console.error("Unable to get items.", error));
+    .catch((error) => {
+      console.error("Unable to get items.", error);
+      redirectToLogin();
+    });
 
   games.forEach((game) => {
     deleteGame(game.id);
@@ -160,7 +185,10 @@ async function updateRank(rankIndex) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(newRank),
-  }).catch((error) => console.error("Unable to update rank.", error));
+  }).catch((error) => {
+    console.error("Unable to update rank.", error);
+    redirectToLogin();
+  });
 }
 
 // Deletes a game from storage
@@ -172,7 +200,15 @@ async function deleteGame(id) {
     },
   })
     .then(() => populateUI())
-    .catch((error) => console.error("Unable to delete item.", error));
+    .catch((error) => {
+      console.error("Unable to delete item.", error);
+      redirectToLogin();
+    });
+}
+
+// Redirect to login
+function redirectToLogin() {
+  location.replace("login.html");
 }
 
 // Event listeners
@@ -191,4 +227,10 @@ resetForm.addEventListener("submit", (e) => {
 
 rankSelect.addEventListener("change", (e) => {
   updateRank(e.target.selectedIndex);
+});
+
+logoutBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  logout();
 });

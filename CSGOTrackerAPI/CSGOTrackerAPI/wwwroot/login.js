@@ -8,7 +8,7 @@ async function login() {
   const password = passwordEl.value;
   const loginQuery = { username: username, password: password };
 
-  const loginResult = await fetch(loginUri, {
+  var loginResult = await fetch(loginUri, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -17,13 +17,26 @@ async function login() {
     body: JSON.stringify(loginQuery),
   })
     .then((res) => res.json())
-    .then((res) => saveToken(res))
-    .catch((error) => console.error("Login failed.", error));
+    .catch((error) => {
+      console.error("Login failed.", error);
+      showError();
+    });
+
+  if (loginResult.token !== undefined) {
+    saveToken(loginResult.token);
+  } else {
+    showError();
+  }
 }
 
-function saveToken(loginResult) {
+function saveToken(token) {
   // TODO: DON'T STORE TOKEN IN LOCALSTORAGE (XSS) !!!
-  localStorage.setItem("token", loginResult.token);
+  localStorage.setItem("token", token);
+  location.replace("index.html");
+}
+
+function showError() {
+  console.log("Login failed");
 }
 
 form.addEventListener("submit", (e) => {
