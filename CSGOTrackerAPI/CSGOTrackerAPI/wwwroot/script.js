@@ -38,7 +38,17 @@ var loginToken;
 
 // Run this script when loading the page
 async function startup() {
+  if (await isTokenStillValid()) {
+    populateUI();
+  } else {
+    redirectToLogin();
+  }
+}
+
+// Check whether the session token is still valid
+async function isTokenStillValid() {
   loginToken = "Bearer " + localStorage.getItem("token");
+
   const checkResult = await fetch(`${uriAuthenticate}/check-token`, {
     method: "POST",
     headers: {
@@ -50,9 +60,9 @@ async function startup() {
   });
 
   if (checkResult.status === 401) {
-    redirectToLogin();
+    return false;
   } else {
-    populateUI();
+    return true;
   }
 }
 
@@ -95,7 +105,7 @@ async function submitWinLoss() {
   }
   const game = { rank: rankList[rank], winloss: winloss };
 
-  await fetch(uriGames, {
+  const submitWinLossResult = await fetch(uriGames, {
     method: "POST",
     headers: {
       Authorization: loginToken,
@@ -103,12 +113,22 @@ async function submitWinLoss() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(game),
-  })
-    .then(() => populateUI())
-    .catch((error) => {
-      console.error("Unable to add item.", error);
-      redirectToLogin();
-    });
+  }).catch((error) => {
+    console.error("Unable to add item.", error);
+    isTokenStillValid();
+    return;
+  });
+
+  if (submitWinLossResult.status === 400) {
+    console.error("SubmitWinLoss failed");
+    return;
+  }
+
+  const submitWinLossBody = await submitWinLossResult.json();
+
+  const element = document.createElement("tr");
+  element.innerHTML = `<td>${rankList[rank]}</td><td>${winloss}</td><td><button class="delete-btn" onClick="deleteGame(${submitWinLossBody.id})">X</button></td>`;
+  resultsTable.appendChild(element);
 
   winEl.checked = false;
   lossEl.checked = false;
@@ -133,7 +153,8 @@ async function populateUI() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get items.", error);
-      //redirectToLogin();
+      isTokenStillValid();
+      return;
     });
 
   if (games === null || games.length === 0) {
@@ -155,6 +176,8 @@ async function populateUI() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get rank.", error);
+      isTokenStillValid();
+      return;
       //redirectToLogin();
     });
 
@@ -173,7 +196,8 @@ async function resetResultsTable() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get items.", error);
-      redirectToLogin();
+      isTokenStillValid();
+      return;
     });
 
   games.forEach((game) => {
@@ -200,7 +224,8 @@ async function updateRank(rankIndex) {
     body: JSON.stringify(newRank),
   }).catch((error) => {
     console.error("Unable to update rank.", error);
-    redirectToLogin();
+    isTokenStillValid();
+    return;
   });
 }
 
@@ -215,7 +240,8 @@ async function deleteGame(id) {
     .then(() => populateUI())
     .catch((error) => {
       console.error("Unable to delete item.", error);
-      redirectToLogin();
+      isTokenStillValid();
+      return;
     });
 }
 
