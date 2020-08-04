@@ -8,7 +8,8 @@ const resultsContainer = document.getElementById("results-container");
 const resetForm = document.getElementById("reset-form");
 const resultsTable = document.getElementById("results-table");
 const rankSelect = document.getElementById("rank");
-const uri = "api/Games";
+const uriGames = "api/Games";
+const uriRanks = "api/Ranks";
 
 var rankList = {
   silver1: "Silver 1",
@@ -54,14 +55,6 @@ async function submitWinLoss() {
     return;
   }
 
-  var games = await fetch(uri)
-    .then((res) => res.json())
-    .catch((error) => console.error("Unable to get items.", error));
-
-  if (games === null) {
-    games = [];
-  }
-
   const rank = rankEl.value;
 
   let winloss;
@@ -74,7 +67,7 @@ async function submitWinLoss() {
   }
   const game = { rank: rankList[rank], winloss: winloss };
 
-  var response = await fetch(uri, {
+  await fetch(uriGames, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -82,11 +75,8 @@ async function submitWinLoss() {
     },
     body: JSON.stringify(game),
   })
-    .then((res) => res.json())
     .then(() => populateUI())
     .catch((error) => console.error("Unable to add item.", error));
-
-  console.log(response);
 
   winEl.checked = false;
   lossEl.checked = false;
@@ -103,12 +93,12 @@ async function populateUI() {
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
-  var games = await fetch(uri)
+  var games = await fetch(uriGames)
     .then((res) => res.json())
     .catch((error) => console.error("Unable to get items.", error));
 
   if (games === null || games.length === 0) {
-    localStorage.removeItem("RankIndex");
+    updateRank(0);
     return;
   }
 
@@ -118,15 +108,18 @@ async function populateUI() {
     resultsTable.appendChild(element);
   });
 
-  const rankIndex = localStorage.getItem("RankIndex");
+  const rankIndex = await fetch(`${uriRanks}/1`)
+    .then((res) => res.json())
+    .catch((error) => console.error("Unable to get rank.", error));
+
   if (rankIndex !== null) {
-    rankSelect.selectedIndex = rankIndex;
+    rankSelect.selectedIndex = rankIndex.rankIndex;
   }
 }
 
 // Reset the results table
 async function resetResultsTable() {
-  var games = await fetch(uri)
+  var games = await fetch(uriGames)
     .then((res) => res.json())
     .catch((error) => console.error("Unable to get items.", error));
 
@@ -138,17 +131,26 @@ async function resetResultsTable() {
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
-  localStorage.removeItem("RankIndex");
+  updateRank(0);
 }
 
 // Update rank so that the selection box remembers the user's rank
-function updateRank(rankIndex) {
-  localStorage.setItem("RankIndex", rankIndex);
+async function updateRank(rankIndex) {
+  console.log(rankIndex);
+  const newRank = { id: 1, rankIndex: rankIndex };
+  await fetch(`${uriRanks}/1`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newRank),
+  }).catch((error) => console.error("Unable to update rank.", error));
 }
 
 // Deletes a game from storage
 async function deleteGame(id) {
-  await fetch(`${uri}/${id}`, {
+  await fetch(`${uriGames}/${id}`, {
     method: "DELETE",
   })
     .then(() => populateUI())
