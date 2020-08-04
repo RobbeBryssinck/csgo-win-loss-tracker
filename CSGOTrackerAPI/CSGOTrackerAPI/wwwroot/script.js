@@ -8,6 +8,7 @@ const resultsContainer = document.getElementById("results-container");
 const resetForm = document.getElementById("reset-form");
 const resultsTable = document.getElementById("results-table");
 const rankSelect = document.getElementById("rank");
+const logoutBtn = document.getElementById("logout-btn");
 const uriGames = "api/Games";
 const uriRanks = "api/Ranks";
 
@@ -32,7 +33,21 @@ var rankList = {
   globalelite: "Global Elite",
 };
 
-populateUI();
+var loginToken = "Bearer " + localStorage.getItem("token");
+
+startup();
+
+function startup() {
+  // TODO: make this an actual authorization check
+  const token = localStorage.getItem("token");
+
+  populateUI();
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  redirectToLogin();
+}
 
 // Show input error message
 function showError(input, message) {
@@ -70,13 +85,17 @@ async function submitWinLoss() {
   await fetch(uriGames, {
     method: "POST",
     headers: {
+      Authorization: loginToken,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
     body: JSON.stringify(game),
   })
     .then(() => populateUI())
-    .catch((error) => console.error("Unable to add item.", error));
+    .catch((error) => {
+      console.error("Unable to add item.", error);
+      redirectToLogin();
+    });
 
   winEl.checked = false;
   lossEl.checked = false;
@@ -93,9 +112,16 @@ async function populateUI() {
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
-  var games = await fetch(uriGames)
+  var games = await fetch(uriGames, {
+    headers: {
+      Authorization: loginToken,
+    },
+  })
     .then((res) => res.json())
-    .catch((error) => console.error("Unable to get items.", error));
+    .catch((error) => {
+      console.error("Unable to get items.", error);
+      redirectToLogin();
+    });
 
   if (games === null || games.length === 0) {
     updateRank(0);
@@ -108,9 +134,16 @@ async function populateUI() {
     resultsTable.appendChild(element);
   });
 
-  const rankIndex = await fetch(`${uriRanks}/1`)
+  const rankIndex = await fetch(`${uriRanks}/1`, {
+    headers: {
+      Authorization: loginToken,
+    },
+  })
     .then((res) => res.json())
-    .catch((error) => console.error("Unable to get rank.", error));
+    .catch((error) => {
+      console.error("Unable to get rank.", error);
+      redirectToLogin();
+    });
 
   if (rankIndex !== null) {
     rankSelect.selectedIndex = rankIndex.rankIndex;
@@ -119,9 +152,16 @@ async function populateUI() {
 
 // Reset the results table
 async function resetResultsTable() {
-  var games = await fetch(uriGames)
+  var games = await fetch(uriGames, {
+    headers: {
+      Authorization: loginToken,
+    },
+  })
     .then((res) => res.json())
-    .catch((error) => console.error("Unable to get items.", error));
+    .catch((error) => {
+      console.error("Unable to get items.", error);
+      redirectToLogin();
+    });
 
   games.forEach((game) => {
     deleteGame(game.id);
@@ -136,25 +176,39 @@ async function resetResultsTable() {
 
 // Update rank so that the selection box remembers the user's rank
 async function updateRank(rankIndex) {
-  console.log(rankIndex);
   const newRank = { id: 1, rankIndex: rankIndex };
   await fetch(`${uriRanks}/1`, {
     method: "PUT",
     headers: {
+      Authorization: loginToken,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
     body: JSON.stringify(newRank),
-  }).catch((error) => console.error("Unable to update rank.", error));
+  }).catch((error) => {
+    console.error("Unable to update rank.", error);
+    redirectToLogin();
+  });
 }
 
 // Deletes a game from storage
 async function deleteGame(id) {
   await fetch(`${uriGames}/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: loginToken,
+    },
   })
     .then(() => populateUI())
-    .catch((error) => console.error("Unable to delete item.", error));
+    .catch((error) => {
+      console.error("Unable to delete item.", error);
+      redirectToLogin();
+    });
+}
+
+// Redirect to login
+function redirectToLogin() {
+  location.replace("login.html");
 }
 
 // Event listeners
@@ -173,4 +227,10 @@ resetForm.addEventListener("submit", (e) => {
 
 rankSelect.addEventListener("change", (e) => {
   updateRank(e.target.selectedIndex);
+});
+
+logoutBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  logout();
 });
