@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CSGOTrackerAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using CSGOTrackerAPI.Authentication;
 
 namespace CSGOTrackerAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GamesController : ControllerBase
