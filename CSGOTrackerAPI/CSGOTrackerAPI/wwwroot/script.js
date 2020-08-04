@@ -32,6 +32,8 @@ var rankList = {
   globalelite: "Global Elite",
 };
 
+var loginToken = "Bearer " + localStorage.getItem("token");
+
 populateUI();
 
 // Show input error message
@@ -70,6 +72,7 @@ async function submitWinLoss() {
   await fetch(uriGames, {
     method: "POST",
     headers: {
+      Authorization: loginToken,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
@@ -93,7 +96,11 @@ async function populateUI() {
   resultsTable.innerHTML =
     "<tr><th>Rank</th><th>Win/Loss?</th><th>Delete</th></tr>";
 
-  var games = await fetch(uriGames)
+  var games = await fetch(uriGames, {
+    headers: {
+      Authorization: loginToken,
+    },
+  })
     .then((res) => res.json())
     .catch((error) => console.error("Unable to get items.", error));
 
@@ -108,7 +115,11 @@ async function populateUI() {
     resultsTable.appendChild(element);
   });
 
-  const rankIndex = await fetch(`${uriRanks}/1`)
+  const rankIndex = await fetch(`${uriRanks}/1`, {
+    headers: {
+      Authorization: loginToken,
+    },
+  })
     .then((res) => res.json())
     .catch((error) => console.error("Unable to get rank.", error));
 
@@ -119,7 +130,11 @@ async function populateUI() {
 
 // Reset the results table
 async function resetResultsTable() {
-  var games = await fetch(uriGames)
+  var games = await fetch(uriGames, {
+    headers: {
+      Authorization: loginToken,
+    },
+  })
     .then((res) => res.json())
     .catch((error) => console.error("Unable to get items.", error));
 
@@ -136,11 +151,11 @@ async function resetResultsTable() {
 
 // Update rank so that the selection box remembers the user's rank
 async function updateRank(rankIndex) {
-  console.log(rankIndex);
   const newRank = { id: 1, rankIndex: rankIndex };
   await fetch(`${uriRanks}/1`, {
     method: "PUT",
     headers: {
+      Authorization: loginToken,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
@@ -152,6 +167,9 @@ async function updateRank(rankIndex) {
 async function deleteGame(id) {
   await fetch(`${uriGames}/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: loginToken,
+    },
   })
     .then(() => populateUI())
     .catch((error) => console.error("Unable to delete item.", error));
