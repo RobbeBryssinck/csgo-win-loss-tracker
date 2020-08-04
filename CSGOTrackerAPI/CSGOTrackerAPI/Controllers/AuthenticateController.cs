@@ -1,4 +1,5 @@
 ﻿using CSGOTrackerAPI.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -117,6 +118,14 @@ namespace CSGOTrackerAPI.Controllers
             }
 
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("check-token")]
+        public IActionResult CheckToken()
+        {
+            return NoContent();
         }
     }
 }

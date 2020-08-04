@@ -11,6 +11,7 @@ const rankSelect = document.getElementById("rank");
 const logoutBtn = document.getElementById("logout-btn");
 const uriGames = "api/Games";
 const uriRanks = "api/Ranks";
+const uriAuthenticate = "api/Authenticate";
 
 var rankList = {
   silver1: "Silver 1",
@@ -33,17 +34,29 @@ var rankList = {
   globalelite: "Global Elite",
 };
 
-var loginToken = "Bearer " + localStorage.getItem("token");
+var loginToken;
 
-startup();
+// Run this script when loading the page
+async function startup() {
+  loginToken = "Bearer " + localStorage.getItem("token");
+  const checkResult = await fetch(`${uriAuthenticate}/check-token`, {
+    method: "POST",
+    headers: {
+      Authorization: loginToken,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: "{}",
+  });
 
-function startup() {
-  // TODO: make this an actual authorization check
-  const token = localStorage.getItem("token");
-
-  populateUI();
+  if (checkResult.status === 401) {
+    redirectToLogin();
+  } else {
+    populateUI();
+  }
 }
 
+// Delete the token and go to the login page
 function logout() {
   localStorage.removeItem("token");
   redirectToLogin();
@@ -120,7 +133,7 @@ async function populateUI() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get items.", error);
-      redirectToLogin();
+      //redirectToLogin();
     });
 
   if (games === null || games.length === 0) {
@@ -142,7 +155,7 @@ async function populateUI() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get rank.", error);
-      redirectToLogin();
+      //redirectToLogin();
     });
 
   if (rankIndex !== null) {
@@ -234,3 +247,5 @@ logoutBtn.addEventListener("click", (e) => {
 
   logout();
 });
+
+startup();
