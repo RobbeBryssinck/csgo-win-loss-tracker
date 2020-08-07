@@ -126,14 +126,23 @@ namespace CSGOTrackerAPI.Controllers
         }
 
         // DELETE: api/Ranks/5
-        // TODO: Ranks DELETE isn't implemented for this application yet
         [HttpDelete("{id}")]
         public async Task<ActionResult<Rank>> DeleteRank(int id)
         {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
             var rank = await _context.Ranks.FindAsync(id);
             if (rank == null)
             {
                 return NotFound();
+            }
+            if (rank.UserId != user.Id)
+            {
+                return Unauthorized();
             }
 
             _context.Ranks.Remove(rank);
