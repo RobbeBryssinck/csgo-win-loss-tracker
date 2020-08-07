@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CSGOTrackerAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using CSGOTrackerAPI.Authentication;
+using Microsoft.AspNetCore.Identity;
 
 namespace CSGOTrackerAPI.Controllers
 {
@@ -17,24 +18,40 @@ namespace CSGOTrackerAPI.Controllers
     public class GamesController : ControllerBase
     {
         private readonly GameContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
 
-        public GamesController(GameContext context)
+        public GamesController(GameContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
         }
 
         // GET: api/Games
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GameDTO>>> GetGames()
         {
-            return await _context.Games.Select(x => GameToDTO(x)).ToListAsync();
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            return await _context.Games.Where(x => x.UserId == user.Id).Select(x => GameToDTO(x)).ToListAsync();
         }
 
         // GET: api/Games/5
         [HttpGet("{id}")]
         public async Task<ActionResult<GameDTO>> GetGame(int id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var game = _context.Games.Where(x => x.UserId == user.Id && x.Id == id).FirstOrDefault();
 
             if (game == null)
             {
@@ -47,6 +64,7 @@ namespace CSGOTrackerAPI.Controllers
         // PUT: api/Games/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        // TODO: Games PUT isn't implemented for this application yet
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGame(int id, GameDTO gameDTO)
         {
@@ -82,8 +100,15 @@ namespace CSGOTrackerAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<GameDTO>> PostGame(GameDTO gameDTO)
         {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
             var game = new Game
             {
+                UserId = user.Id,
                 Rank = gameDTO.Rank,
                 WinLoss = gameDTO.WinLoss
             };

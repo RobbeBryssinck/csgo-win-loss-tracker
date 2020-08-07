@@ -183,6 +183,22 @@ async function populateUI() {
 
   if (rankIndex !== null) {
     rankSelect.selectedIndex = rankIndex.rankIndex;
+  } else {
+    const body = { RankIndex: 0 };
+
+    await fetch(uriRanks, {
+      method: "POST",
+      headers: {
+        Authorization: loginToken,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }).catch((error) => {
+      console.error("Unable to set rank.", error);
+      isTokenStillValid();
+      return;
+    });
   }
 }
 

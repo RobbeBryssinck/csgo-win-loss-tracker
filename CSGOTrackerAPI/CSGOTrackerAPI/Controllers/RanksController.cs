@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CSGOTrackerAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using CSGOTrackerAPI.Authentication;
 
 namespace CSGOTrackerAPI.Controllers
 {
@@ -16,25 +18,40 @@ namespace CSGOTrackerAPI.Controllers
     public class RanksController : ControllerBase
     {
         private readonly GameContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
 
-        public RanksController(GameContext context)
+        public RanksController(GameContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
         }
 
         // GET: api/Ranks
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rank>>> GetRanks()
         {
-            return await _context.Ranks.ToListAsync();
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            // TODO: tell the client to log out
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            return await _context.Ranks.Where(x => x.UserId == user.Id).ToListAsync();
         }
 
         // GET: api/Ranks/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Rank>> GetRank(int id)
         {
-            var rank = await _context.Ranks.FindAsync(id);
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
 
+            var rank = _context.Ranks.Where(x => x.UserId == user.Id && x.Id == id).FirstOrDefault();
             if (rank == null)
             {
                 return NotFound();
@@ -47,29 +64,38 @@ namespace CSGOTrackerAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRank(int id, Rank rank)
+        public async Task<IActionResult> PutRank(int id, RankDTO rankDTO)
         {
-            if (id != rank.Id)
+            if (id != rankDTO.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(rank).State = EntityState.Modified;
+            var rank = await _context.Ranks.FindAsync(id);
+            if (rank == null)
+            {
+                return NotFound();
+            }
+
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            if (rank.UserId != user.Id)
+            {
+                return Unauthorized();
+            }
+
+            rank.RankIndex = rankDTO.RankIndex;
 
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException) when (!RankExists(id))
             {
-                if (!RankExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return NoContent();
@@ -79,15 +105,28 @@ namespace CSGOTrackerAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Rank>> PostRank(Rank rank)
+        public async Task<ActionResult<Rank>> PostRank(RankDTO rankDTO)
         {
+            var user = await userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var rank = new Rank
+            {
+                UserId = user.Id,
+                RankIndex = rankDTO.RankIndex
+            };
+
             _context.Ranks.Add(rank);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRank", new { id = rank.Id }, rank);
+            return CreatedAtAction("GetRank", new { id = rankDTO.Id }, rankDTO);
         }
 
         // DELETE: api/Ranks/5
+        // TODO: Ranks DELETE isn't implemented for this application yet
         [HttpDelete("{id}")]
         public async Task<ActionResult<Rank>> DeleteRank(int id)
         {
