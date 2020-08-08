@@ -66,6 +66,14 @@ async function isTokenStillValid() {
   }
 }
 
+// Token check
+async function tokenCheck() {
+  if (!(await isTokenStillValid())) {
+    localStorage.removeItem("token");
+    redirectToLogin();
+  }
+}
+
 // Delete the token and go to the login page
 function logout() {
   localStorage.removeItem("token");
@@ -115,8 +123,7 @@ async function submitWinLoss() {
     body: JSON.stringify(game),
   }).catch((error) => {
     console.error("Unable to add item.", error);
-    isTokenStillValid();
-    return;
+    tokenCheck();
   });
 
   if (submitWinLossResult.status === 400) {
@@ -153,8 +160,7 @@ async function populateUI() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get items.", error);
-      isTokenStillValid();
-      return;
+      tokenCheck();
     });
 
   if (games === null || games.length === 0) {
@@ -176,9 +182,7 @@ async function populateUI() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get rank.", error);
-      isTokenStillValid();
-      return;
-      //redirectToLogin();
+      tokenCheck();
     });
 
   if (rankIndex !== null) {
@@ -196,8 +200,7 @@ async function populateUI() {
       body: JSON.stringify(body),
     }).catch((error) => {
       console.error("Unable to set rank.", error);
-      isTokenStillValid();
-      return;
+      tokenCheck();
     });
   }
 }
@@ -212,8 +215,7 @@ async function resetResultsTable() {
     .then((res) => res.json())
     .catch((error) => {
       console.error("Unable to get items.", error);
-      isTokenStillValid();
-      return;
+      tokenCheck();
     });
 
   games.forEach((game) => {
@@ -240,8 +242,7 @@ async function updateRank(rankIndex) {
     body: JSON.stringify(newRank),
   }).catch((error) => {
     console.error("Unable to update rank.", error);
-    isTokenStillValid();
-    return;
+    tokenCheck();
   });
 }
 
@@ -256,8 +257,7 @@ async function deleteGame(id) {
     .then(() => populateUI())
     .catch((error) => {
       console.error("Unable to delete item.", error);
-      isTokenStillValid();
-      return;
+      tokenCheck();
     });
 }
 
