@@ -146,6 +146,14 @@ tr:nth-child(even) {
   visibility: hidden;
 }
 
+.not-registered {
+  margin-top: 20px;
+}
+
+.not-logged-in {
+  margin-top: 20px;
+}
+
 select:focus,
 input:focus,
 button:focus {

@@ -82,15 +82,6 @@ function checkLength(input, min, max) {
 
 // Checks all fields
 function areAllFieldsCorrect() {
-  /*
-  var check = checkRequired([username, email, password, password2]);
-  check = checkLength(username, 3, 15);
-  check = checkLength(password, 6, 25);
-  check = checkLength(password2, 6, 25);
-  check = checkEmail(email);
-  check = checkPasswordsMatch(password, password2);
-  */
-
   return (
     checkRequired([username, email, password, password2]) &
     checkLength(username, 3, 15) &
