@@ -1,4 +1,5 @@
 ﻿using CSGOTrackerAPI.Authentication;
+using CSGOTrackerAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -21,12 +22,14 @@ namespace CSGOTrackerAPI.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
+        private readonly GameContext _context;
 
-        public AuthenticateController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthenticateController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, GameContext context)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             _configuration = configuration;
+            _context = context;
         }
 
         [HttpPost]
@@ -85,6 +88,15 @@ namespace CSGOTrackerAPI.Controllers
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+
+            var userForRank = await userManager.FindByNameAsync(model.Username);
+            var rank = new Rank
+            {
+                UserId = userForRank.Id,
+                RankIndex = 1
+            };
+            _context.Ranks.Add(rank);
+            await _context.SaveChangesAsync();
 
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }

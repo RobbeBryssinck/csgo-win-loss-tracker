@@ -174,9 +174,11 @@ async function populateUI() {
     resultsTable.appendChild(element);
   });
 
-  const rankIndex = await fetch(`${uriRanks}/1`, {
+  var rankIndex = await fetch(`${uriRanks}/1`, {
     headers: {
       Authorization: loginToken,
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
   })
     .then((res) => res.json())

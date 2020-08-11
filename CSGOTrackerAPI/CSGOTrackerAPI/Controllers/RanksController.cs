@@ -122,7 +122,7 @@ namespace CSGOTrackerAPI.Controllers
             _context.Ranks.Add(rank);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRank", new { id = rankDTO.Id }, rankDTO);
+            return CreatedAtAction(nameof(GetRank), new { id = rankDTO.Id }, rankDTO);
         }
 
         // DELETE: api/Ranks/5
@@ -155,5 +155,7 @@ namespace CSGOTrackerAPI.Controllers
         {
             return _context.Ranks.Any(e => e.Id == id);
         }
+
+        // TODO: RankToDTO()
     }
 }
